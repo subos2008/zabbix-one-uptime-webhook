@@ -1,0 +1,67 @@
+
+This code bridges from Zabbix triggers to One Uptime.
+
+Allowing you to define triggers in Zabbix that create Incidents in One Uptime on pre-created monitors. You need to create the Monitors in One Uptime first and maintain a map in this code between Zabbix trigger IDs and One Uptime Monitor IDs. We use IDs instead of names so that renaming things doesn't break the alerting system.
+
+# Configuration in Zabbix 
+
+Zabbix can be configured to call webhooks when triggers fire. They call these `Media Types` and they are found in the Administration menu on the left in Zabbix. Triggers cause Events with can be Notified by Media Types. Webhook is a Media Type in Zabbix.
+
+You can put raw `.js` code in Webhook Media Types.
+
+Note that this code could be packaged up in a .json file for easy install in Zabbix's UI. See [github.com/jooola/zabbix-matrix-webhook](https://github.com/jooola/zabbix-matrix-webhook?tab=readme-ov-file#readme) for an example.
+
+### Global User Macros
+
+First add the global config as user 'macros' is Zabbix Administration -> General -> Macros:
+
+![alt text](media/global-macros.png)
+
+### Add a Media Type
+
+> ⚠️ We are thinking to have one Media Type per Event that is being forwarded. This means if someone mis-configures one event it doesn't effect other events. We need to check if the Zabbix UI can work with this.
+
+Add a new Media Type and paste the source code into the 'script' box.
+
+> 📋 TODO: I need to add info on which params need adding, could package that up in a YAML or JSON blob for importing.
+
+![alt text](media/zabbix-media-type.png)
+
+
+# Local Development
+
+# Setup
+
+> ℹ️ Local development support has been paused as Zabbix uses a custom function to access remote APIs, `CurlHttpRequest`, which would need reimplementing. You can use the Test button in the Zabbix API.
+
+Project ID is in One Uptime under: More -> Project Settings -> Project
+
+Add the following in `.env`:
+
+```
+ONE_UPTIME_API_KEY=...
+ONE_UPTIME_PROJECT_ID=..
+ONE_UPTIME_URL=...
+```
+
+node one-password-monitor-incident.js
+
+# Resources
+
+1. List of [Zabbix Macros](https://www.zabbix.com/documentation/current/en/manual/appendix/macros/supported_by_location)
+1. The inspiration for this project: https://github.com/jooola/zabbix-matrix-webhook?tab=readme-ov-file#readme
+1. And https://www.zabbix.com/documentation/current/en/manual/xml_export_import/media#importing
+
+
+# One Uptime API
+
+Incidents: https://oneuptime.com/reference/incident
+
+# Design
+
+I think a Zabix trigger will map to a One Uptime incident on a monitor.
+
+Params: 
+- changeMonitorStatusTo
+- remediationNotes
+- rootCause

@@ -1,7 +1,8 @@
 // NB, you can use console.log, warn, error in Zabbix code. c.f. https://www.zabbix.com/documentation/current/en/manual/config/items/preprocessing/javascript/javascript_objects
 
-/* 
-Debug for when running on local machine: */
+/****************************************************************************** */
+/* Debug for when running on local machine: */
+/****************************************************************************** */
 const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });
 const value = JSON.stringify({
@@ -14,42 +15,43 @@ const value = JSON.stringify({
 });
 const { execSync } = require('child_process');
 
-function CurlHttpRequest(url, options = {}) {
-  // Helper function to build the curl command with options
-  const buildCurlCommand = (opts) => {
-    let cmd = `curl -s -X ${opts.method || 'GET'}`;
-    if (opts.headers) {
-      for (const [key, value] of Object.entries(opts.headers)) {
-        cmd += ` -H "${key}: ${value}"`;
-      }
-    }
-    if (opts.data) {
-      cmd += ` -d '${JSON.stringify(opts.data)}'`;
-    }
-    if (opts.proxy) {
-      cmd += ` --proxy ${opts.proxy}`;
-    }
-    if (opts.auth) {
-      cmd += ` -u '${opts.auth.username}:${opts.auth.password}'`;
-    }
-    cmd += ` ${url}`;
-    return cmd;
-  }
+// Code from GPT, not reviewed
+// function CurlHttpRequest(url, options = {}) {
+//   // Helper function to build the curl command with options
+//   const buildCurlCommand = (opts) => {
+//     let cmd = `curl -s -X ${opts.method || 'GET'}`;
+//     if (opts.headers) {
+//       for (const [key, value] of Object.entries(opts.headers)) {
+//         cmd += ` -H "${key}: ${value}"`;
+//       }
+//     }
+//     if (opts.data) {
+//       cmd += ` -d '${JSON.stringify(opts.data)}'`;
+//     }
+//     if (opts.proxy) {
+//       cmd += ` --proxy ${opts.proxy}`;
+//     }
+//     if (opts.auth) {
+//       cmd += ` -u '${opts.auth.username}:${opts.auth.password}'`;
+//     }
+//     cmd += ` ${url}`;
+//     return cmd;
+//   }
 
-  // Execute the curl command and return the response
-  const response = execSync(buildCurlCommand(options)).toString();
-  const statusCode = parseInt(execSync('curl -o /dev/null -w %{http_code} ' + buildCurlCommand(options)));
+//   // Execute the curl command and return the response
+//   const response = execSync(buildCurlCommand(options)).toString();
+//   const statusCode = parseInt(execSync('curl -o /dev/null -w %{http_code} ' + buildCurlCommand(options)));
 
-  // Return an object with similar structure to CurlHttpRequest
-  return {
-    status() {
-      return statusCode;
-    },
-    responseText() {
-      return response;
-    },
-  };
-}
+//   // Return an object with similar structure to CurlHttpRequest
+//   return {
+//     status() {
+//       return statusCode;
+//     },
+//     responseText() {
+//       return response;
+//     },
+//   };
+// }
 
 // Example usage
 const httpRequest = CurlHttpRequest('https://www.example.com', {
@@ -65,7 +67,9 @@ const httpRequest = CurlHttpRequest('https://www.example.com', {
 console.log(httpRequest.status()); // Output: The status code of the request
 console.log(httpRequest.responseText()); // Output: The response body as a string
 
+/****************************************************************************** */
 /* End of local dev code */
+/****************************************************************************** */
 
 // event_url is an optional extra
 const required_input = [
@@ -85,6 +89,10 @@ const required_input = [
   // See logic below, these are either 0 or 1
   'event_is_problem',
   'event_is_update',
+
+  // Used for mapping (WIP)
+  'event_name',
+  'event_id'
 ];
 
 // WIP development consts

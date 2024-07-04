@@ -1,3 +1,5 @@
+#!./node_modules/.bin/ts-node
+
 // dependencies: express, typescript
 
 import express from 'express';

@@ -11,6 +11,21 @@ You can put raw `.js` code in Webhook Media Types.
 
 Note that this code could be packaged up in a .json file for easy install in Zabbix's UI. See [github.com/jooola/zabbix-matrix-webhook](https://github.com/jooola/zabbix-matrix-webhook?tab=readme-ov-file#readme) for an example.
 
+# Add a Medium on your Profile to get Alerts
+
+> ⛔️ Note this from the docs: 
+> To receive notifications of a media type, a medium (email address/phone number/webhook user ID, etc.) for this media type must be defined in the user profile. For example, an action sending messages to user "Admin" using webhook "X" will always fail to send anything if the webhook "X" medium is not defined in the user profile.
+
+So you have to set the operation to a user who has a value setup form this Media Type on their profile.
+
+![alt text](media/profile-media-setup.png)
+
+# Setup Trigger Actions
+
+You also need to add the new Media Type as a Trigger Action with an Operation as such:
+
+![alt text](media/trigger-actions.png)
+
 ### Global User Macros
 
 First add the global config as user 'macros' is Zabbix Administration -> General -> Macros:

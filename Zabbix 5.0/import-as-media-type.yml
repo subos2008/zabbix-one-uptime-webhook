@@ -2,13 +2,13 @@ zabbix_export:
   version: "5.0"
   date: "2021-02-24T14:57:02Z"
   media_types:
-    - name: Rename Me as the event forwarded
+    - name: One Uptime Bridge Server
       type: WEBHOOK
       description: |
         https://github.com/subos2008/zabbix-one-uptime-webhook#readme
       parameters:
         - name: SERVER_URL
-          value: {$ZABBIX_ONEUPTIME_BRIDGE_SERVER}
+          value: "{$ZABBIX_ONEUPTIME_BRIDGE_SERVER}"
         - name: alert_subject
           value: "{ALERT.SUBJECT}"
         - name: alert_message
@@ -24,17 +24,17 @@ zabbix_export:
         - name: event_name
           value: "{EVENT.NAME}"
         - name: event_cause_name
-          value: {EVENT.CAUSE.NAME}
+          value: "{EVENT.CAUSE.NAME}"
         - name: event_symptoms
-          value: {EVENT.SYMPTOMS}
+          value: "{EVENT.SYMPTOMS}"
         - name: item_name
-          value: {ITEM.NAME}
+          value: "{ITEM.NAME}"
         - name: trigger_name
-          value: {TRIGGER.NAME}
+          value: "{TRIGGER.NAME}"
         - name: trigger_id
-          value: {TRIGGER.ID}
+          value: "{TRIGGER.ID}"
         - name: trigger_url
-          value: {TRIGGER.URL}
+          value: "{TRIGGER.URL}"
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
@@ -122,7 +122,7 @@ zabbix_export:
             const path = '/api/zabbix_webhook';
             var request = new CurlHttpRequest();
             request.AddHeader('Content-Type: application/json');
-            var url = ZabbixOneUptimeBridgeServer.SERVER_URL + path;
+            var url = ZabbixOneUptimeBridgeServer.raw_params.SERVER_URL + path;
 
             console.log('[ZabbixOneUptimeBridgeServer Webhook] new request to: ' + url);
 

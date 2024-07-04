@@ -60,7 +60,7 @@ var ZabbixOneUptimeBridgeServer = {
     const path = '/api/zabbix_webhook';
     var request = new CurlHttpRequest();
     request.AddHeader('Content-Type: application/json');
-    var url = ZabbixOneUptimeBridgeServer.SERVER_URL + path;
+    var url = ZabbixOneUptimeBridgeServer.raw_params.SERVER_URL + path;
 
     console.log('[ZabbixOneUptimeBridgeServer Webhook] new request to: ' + url);
 

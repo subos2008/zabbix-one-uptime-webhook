@@ -9,14 +9,14 @@ const port = process.env.PORT || 3168;
 
 app.use(express.json());
 
-app.post('/zabbix_webhook', (req, res) => {
+app.post('/api/zabbix_webhook', (req, res) => {
   // Handle the webhook data from Zabbix
   const data = req.body;
   console.log('Received Zabbix webhook data:', data);
 
   // Perform any actions based on the webhook data (e.g., send notifications, store data)
 
-  res.sendStatus(200);
+  res.json({ Status: "OK" })
 });
 
 app.listen(port, () => {

@@ -64,15 +64,15 @@ app.post('/api/zabbix_webhook', (req, res) => {
 });
 
 // Interface to define the expected response structure (replace with your actual response structure)
-interface ApiResponse {
+interface Problem {
   // Add properties based on your API response
   message: string;
 }
 
 async function get_problems_at_severity_level(
   severity: string
-): Promise<ApiResponse> {
-  severity;
+): Promise<Problem[]> {
+  const integer_severity_as_string = zabbix_severity[severity].toString()
   const zabbix_base_url = process.env.ZABBIX_SERVER_URL;
   const auth_token = process.env.ZABBIX_API_TOKEN;
 
@@ -118,7 +118,7 @@ async function get_problems_at_severity_level(
     const data = (await response.json()) as any;
     const problems = data.result;
 
-    return problems.filter((i: any) => i.severity == severity);
+    return problems.filter((i: any) => i.severity == integer_severity_as_string);
   } catch (error) {
     console.error('Error fetching data:', error);
     throw error; // Re-throw the error for further handling
@@ -137,7 +137,7 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
   }
   // TODO: this code is shit
   get_problems_at_severity_level(req.params.severity).then(
-    (problems) => res.json({ Status: 'OK', problems }),
+    (problems: Problem[]) => res.json({ Status: 'OK', problems, count: problems.length }),
     () => {
       res.status(500);
       res.json({ Status: 'FAIL' });

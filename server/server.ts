@@ -18,7 +18,7 @@ const zabbix_severity: { [key: string]: number } = {
 };
 
 function get_severity_string(i: number): string | undefined {
-  let names = Object.keys(zabbix_severity)
+  let names = Object.keys(zabbix_severity);
   for (let index = 0; index < names.length; index++) {
     const name = names[index];
     if (zabbix_severity[name] === i) return name;
@@ -27,13 +27,13 @@ function get_severity_string(i: number): string | undefined {
 }
 
 type ZabbixWebhookData = {
-  event_severity: string
-  alert_message: string
-  host: string
-  trigger_name: string
-  event_is_problem: string
-  event_is_update: string
-}
+  event_severity: string;
+  alert_message: string;
+  host: string;
+  trigger_name: string;
+  event_is_problem: string;
+  event_is_update: string;
+};
 
 // To be called by Zabbix Media Type is alert us there's been a change in monitoring status
 app.post('/api/zabbix_webhook', (req, res) => {
@@ -43,7 +43,7 @@ app.post('/api/zabbix_webhook', (req, res) => {
   let severity: string = (
     get_severity_string(parseInt(data.event_severity)) || 'UNDEFINED'
   ).toUpperCase();
-  let kind //, icon
+  let kind; //, icon
   if (data.event_is_problem == '1') {
     if (data.event_is_update == '0') {
       kind = 'problem';
@@ -69,10 +69,12 @@ interface ApiResponse {
   message: string;
 }
 
-async function get_problems_at_severity_level(severity: string): Promise<ApiResponse> {
+async function get_problems_at_severity_level(
+  severity: string
+): Promise<ApiResponse> {
   severity;
   const zabbix_base_url = process.env.ZABBIX_SERVER_URL;
-  const auth_token = process.env.ZABBIX_API_TOKEN
+  const auth_token = process.env.ZABBIX_API_TOKEN;
 
   if (!zabbix_base_url) {
     throw new Error('ZABBIX_SERVER_URL environment variable is not set');
@@ -84,26 +86,26 @@ async function get_problems_at_severity_level(severity: string): Promise<ApiResp
 
   try {
     const body = {
-      "jsonrpc": "2.0",
-      "method": "problem.get",
-      "params": {
-        "output": "extend",
-        "selectAcknowledges": "extend",
-        "selectTags": "extend",
-        "selectSuppressionData": "extend",
-        "recent": "true",
-        "sortfield": ["eventid"],
-        "sortorder": "DESC",
-        "acknowledged": "0"
+      jsonrpc: '2.0',
+      method: 'problem.get',
+      params: {
+        output: 'extend',
+        selectAcknowledges: 'extend',
+        selectTags: 'extend',
+        selectSuppressionData: 'extend',
+        recent: 'true',
+        sortfield: ['eventid'],
+        sortorder: 'DESC',
+        acknowledged: '0',
       },
-      "auth": auth_token,
-      "id": 2
-    }
+      auth: auth_token,
+      id: 2,
+    };
 
     const response = await fetch(resolve(zabbix_base_url, '/api_jsonrpc.php'), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${auth_token}`,
+        Authorization: `Bearer ${auth_token}`,
         'Content-Type': 'application/json', // Adjust content type based on your request body format
       },
       body: JSON.stringify(body),
@@ -113,10 +115,10 @@ async function get_problems_at_severity_level(severity: string): Promise<ApiResp
       throw new Error(`API request failed with status: ${response.status}`);
     }
 
-    const data: ApiResponse = await response.json() as ApiResponse;
-    console.log(data)
+    const data = (await response.json()) as any;
+    const problems = data.result;
 
-    return data;
+    return problems.filter((i: any) => i.severity == severity);
   } catch (error) {
     console.error('Error fetching data:', error);
     throw error; // Re-throw the error for further handling
@@ -134,8 +136,13 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
     });
   }
   // TODO: this code is shit
-  get_problems_at_severity_level(req.params.severity).then((problems) =>
-    res.json({ Status: 'OK', problems }), () => { res.status(500); res.json({ Status: "FAIL" }) })
+  get_problems_at_severity_level(req.params.severity).then(
+    (problems) => res.json({ Status: 'OK', problems }),
+    () => {
+      res.status(500);
+      res.json({ Status: 'FAIL' });
+    }
+  );
 });
 
 app.listen(port, () => {

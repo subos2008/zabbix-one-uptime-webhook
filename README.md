@@ -22,7 +22,7 @@ So you have to set the operation to a user who has a value setup form this Media
 
 # Setup Trigger Actions
 
-You also need to add the new Media Type as a Trigger Action with an Operation as such:
+You also need to add the new Media Type as a Trigger Action with an Operation. This tells Zabbix to use the Media Type to deliver Events caused by Triggers when they happen:
 
 ![alt text](media/trigger-actions.png)
 

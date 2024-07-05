@@ -1,7 +1,19 @@
 
+# Zabbit One Uptime Webhook Bridge
+
 This code bridges from Zabbix triggers to One Uptime.
 
-Allowing you to define triggers in Zabbix that create Incidents in One Uptime on pre-created monitors. You need to create the Monitors in One Uptime first and maintain a map in this code between Zabbix trigger IDs and One Uptime Monitor IDs. We use IDs instead of names so that renaming things doesn't break the alerting system.
+Allowing you to define triggers in Zabbix that create Incidents in One Uptime on pre-created monitors. You need to create the Monitors in One Uptime first and maintain a map between Zabbix trigger IDs or serverity levels and One Uptime Monitor IDs. 
+
+> ℹ️ We use IDs instead of names so that renaming things doesn't break the production alerting system.
+
+# Architecture
+
+There are two parts to the system [./Zabbix%205.0/](./Zabbix%205.0/) and [./server/](./server/).
+
+The Zabbix code is a plugin for Zabbix called a Media Type that has to be carefully configured in Zabbix
+
+The `server` is a work in progress that may be depricated eventually.
 
 # Configuration in Zabbix 
 
@@ -16,7 +28,7 @@ Note that this code could be packaged up in a .json file for easy install in Zab
 > ⛔️ Note this from the docs: 
 > To receive notifications of a media type, a medium (email address/phone number/webhook user ID, etc.) for this media type must be defined in the user profile. For example, an action sending messages to user "Admin" using webhook "X" will always fail to send anything if the webhook "X" medium is not defined in the user profile.
 
-So you have to set the operation to a user who has a value setup form this Media Type on their profile.
+So you have to set the operation to a user who has a value setup for this Media Type on their profile. It does't matter what the value it, it isn't used by this code it just needs not to be blank/missing or Zabbix behaves as if you can't get SMS alerts because you hadn't added you phone number, etc.
 
 ![alt text](media/profile-media-setup.png)
 

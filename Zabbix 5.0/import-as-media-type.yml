@@ -11,6 +11,8 @@ zabbix_export:
           value: "{$ZABBIX_ONEUPTIME_BRIDGE_SERVER}"
         - name: alert_subject
           value: "{ALERT.SUBJECT}"
+        - name: host
+          value: "{HOST.NAME}"
         - name: alert_message
           value: "{ALERT.MESSAGE}"
         - name: event_severity

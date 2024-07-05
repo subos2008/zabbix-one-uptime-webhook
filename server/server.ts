@@ -7,18 +7,31 @@ const app = express();
 const port = process.env.PORT || 3168;
 
 app.use(express.json());
-
 const zabbix_severity: { [key: string]: number } = {
-  warning: 0,
-  disaster: 4,
+  'not-classified': 0,
+  information: 1,
+  warning: 2,
+  average: 3,
+  high: 4,
+  disaster: 5,
 };
+
+function get_severity_string(i: number): string | undefined {
+  Object.keys(zabbix_severity).forEach((name) => {
+    if (zabbix_severity[name] === i) return name;
+  });
+  return undefined;
+}
 
 // To be called by Zabbix Media Type is alert us there's been a change in monitoring status
 app.post('/api/zabbix_webhook', (req, res) => {
   // Handle the webhook data from Zabbix
   const data = req.body;
-  console.log('Received Zabbix webhook data:', data);
-
+  // console.log('Received Zabbix webhook data:', data);
+  let severity = (
+    get_severity_string(data.event_severity) || 'UNDEFINED'
+  ).toUpperCase();
+  console.log(`${severity}: ${data.alert_message}`);
   // Perform any actions based on the webhook data (e.g., send notifications, store data)
 
   res.json({ Status: 'OK' });

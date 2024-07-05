@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 import express from 'express';
+import { resolve } from 'url';
 
 const app = express();
 const port = process.env.PORT || 3168;
@@ -62,8 +63,64 @@ app.post('/api/zabbix_webhook', (req, res) => {
   res.json({ Status: 'OK' });
 });
 
-function get_problems_at_severity_level(severity: string) {
-  
+// Interface to define the expected response structure (replace with your actual response structure)
+interface ApiResponse {
+  // Add properties based on your API response
+  message: string;
+}
+
+async function get_problems_at_severity_level(severity: string): Promise<ApiResponse> {
+  severity;
+  const zabbix_base_url = process.env.ZABBIX_SERVER_URL;
+  const auth_token = process.env.ZABBIX_API_TOKEN
+
+  if (!zabbix_base_url) {
+    throw new Error('ZABBIX_SERVER_URL environment variable is not set');
+  }
+
+  if (!auth_token) {
+    throw new Error('ZABBIX_API_TOKEN environment variable is not set');
+  }
+
+  try {
+    const body = {
+      "jsonrpc": "2.0",
+      "method": "problem.get",
+      "params": {
+        "output": "extend",
+        "selectAcknowledges": "extend",
+        "selectTags": "extend",
+        "selectSuppressionData": "extend",
+        "recent": "true",
+        "sortfield": ["eventid"],
+        "sortorder": "DESC",
+        "acknowledged": "0"
+      },
+      "auth": auth_token,
+      "id": 2
+    }
+
+    const response = await fetch(resolve(zabbix_base_url, '/api_jsonrpc.php'), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${auth_token}`,
+        'Content-Type': 'application/json', // Adjust content type based on your request body format
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status: ${response.status}`);
+    }
+
+    const data: ApiResponse = await response.json() as ApiResponse;
+    console.log(data)
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error; // Re-throw the error for further handling
+  }
 }
 
 app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
@@ -76,8 +133,9 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
       ).join(', ')}`,
     });
   }
-  let problems = get_problems_at_severity_level(req.params.severity)
-  res.json({ Status: 'OK', problems });
+  // TODO: this code is shit
+  get_problems_at_severity_level(req.params.severity).then((problems) =>
+    res.json({ Status: 'OK', problems }), () => { res.status(500); res.json({ Status: "FAIL" }) })
 });
 
 app.listen(port, () => {

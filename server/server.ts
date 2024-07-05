@@ -17,25 +17,54 @@ const zabbix_severity: { [key: string]: number } = {
 };
 
 function get_severity_string(i: number): string | undefined {
-  Object.keys(zabbix_severity).forEach((name) => {
+  let names = Object.keys(zabbix_severity)
+  for (let index = 0; index < names.length; index++) {
+    const name = names[index];
     if (zabbix_severity[name] === i) return name;
-  });
+  }
   return undefined;
+}
+
+type ZabbixWebhookData = {
+  event_severity: string
+  alert_message: string
+  host: string
+  trigger_name: string
+  event_is_problem: string
+  event_is_update: string
 }
 
 // To be called by Zabbix Media Type is alert us there's been a change in monitoring status
 app.post('/api/zabbix_webhook', (req, res) => {
   // Handle the webhook data from Zabbix
-  const data = req.body;
+  const data: ZabbixWebhookData = req.body.data;
   // console.log('Received Zabbix webhook data:', data);
-  let severity = (
-    get_severity_string(data.event_severity) || 'UNDEFINED'
+  let severity: string = (
+    get_severity_string(parseInt(data.event_severity)) || 'UNDEFINED'
   ).toUpperCase();
-  console.log(`${severity}: ${data.alert_message}`);
+  let kind //, icon
+  if (data.event_is_problem == '1') {
+    if (data.event_is_update == '0') {
+      kind = 'problem';
+      // icon = '⚠️'
+    } else {
+      kind = 'update';
+      // icon = 'ℹ️'
+    }
+  } else {
+    kind = 'recovery';
+    // icon = '✅'
+  }
+  if (['problem'].includes(kind))
+    console.log(`${severity}: ${data.host} ${data.trigger_name}`);
   // Perform any actions based on the webhook data (e.g., send notifications, store data)
 
   res.json({ Status: 'OK' });
 });
+
+function get_problems_at_severity_level(severity: string) {
+  
+}
 
 app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
   const severity: number | undefined = zabbix_severity[req.params.severity];
@@ -47,12 +76,8 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
       ).join(', ')}`,
     });
   }
-  const data = req.body;
-  console.log('Received Zabbix webhook data:', data);
-
-  // Perform any actions based on the webhook data (e.g., send notifications, store data)
-
-  res.json({ Status: 'OK' });
+  let problems = get_problems_at_severity_level(req.params.severity)
+  res.json({ Status: 'OK', problems });
 });
 
 app.listen(port, () => {

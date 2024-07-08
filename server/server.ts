@@ -137,7 +137,7 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
   }
   // TODO: this code is shit
   get_problems_at_severity_level(req.params.severity).then(
-    (problems: Problem[]) => res.json({ Status: 'OK', problems, count: problems.length }),
+    (problems: Problem[]) => res.json({ Status: 'OK', problems, count: problems.length, severity }),
     () => {
       res.status(500);
       res.json({ Status: 'FAIL' });

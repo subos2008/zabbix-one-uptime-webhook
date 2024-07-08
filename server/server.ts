@@ -60,7 +60,7 @@ app.post('/api/zabbix_webhook', (req, res) => {
     console.log(`${severity}: ${data.host} ${data.trigger_name}`);
   // Perform any actions based on the webhook data (e.g., send notifications, store data)
 
-  res.json({ Status: 'OK' });
+  res.json({ status: 'OK' });
 });
 
 // Interface to define the expected response structure (replace with your actual response structure)
@@ -130,17 +130,17 @@ app.get(`/api/v1/zabbix-alerts/:severity`, (req, res) => {
   if (typeof severity === 'undefined') {
     res.status(400);
     res.json({
-      Status: `Severity level '${severity}' not recognised, use one of ${Object.keys(
+      status: `Severity level '${severity}' not recognised, use one of ${Object.keys(
         zabbix_severity
       ).join(', ')}`,
     });
   }
   // TODO: this code is shit
   get_problems_at_severity_level(req.params.severity).then(
-    (problems: Problem[]) => res.json({ Status: 'OK', problems, count: problems.length, severity }),
+    (problems: Problem[]) => res.json({ status: 'OK', problems, count: problems.length, severity }),
     () => {
       res.status(500);
-      res.json({ Status: 'FAIL' });
+      res.json({ status: 'FAIL' });
     }
   );
 });

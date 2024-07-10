@@ -1,0 +1,62 @@
+{
+	"info": {
+		"_postman_id": "518c4f3b-f272-49d2-896b-0005c49e0ecf",
+		"name": "One Uptime Workflow Webhook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10351435"
+	},
+	"item": [
+		{
+			"name": "Create Incident",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"trigger_url\": \"http://zabbix.mycompany.com/tr_events.php?triggerid=2861&eventid=2800177\",\n    \"host\": \"mynode.mycompany\",\n    \"alert_subject\": \"Test Event\",\n    \"alert_description\": \"Problem 27802117 started at 02:27:06 on 2024.07.05\\r\\nHost: mynode.mycompany\\r\\nSeverity: Information\",\n    \"event_severity\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ONE_UPTIME_WORKFLOW_WEBHOOK_URL}}",
+					"host": [
+						"{{ONE_UPTIME_WORKFLOW_WEBHOOK_URL}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ONE_UPTIME_WORKFLOW_WEBHOOK_URL",
+			"value": "my url",
+			"type": "string"
+		}
+	]
+}

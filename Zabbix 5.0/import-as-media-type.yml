@@ -7,8 +7,8 @@ zabbix_export:
       description: |
         https://github.com/subos2008/zabbix-one-uptime-webhook#readme
       parameters:
-        - name: SERVER_URL
-          value: "{$ZABBIX_ONEUPTIME_BRIDGE_SERVER}"
+        - name: ONE_UPTIME_WORKFLOW_WEBHOOK_URL
+          value: "{$ONE_UPTIME_WORKFLOW_WEBHOOK_URL}"
         - name: alert_subject
           value: "{ALERT.SUBJECT}"
         - name: host
@@ -23,20 +23,20 @@ zabbix_export:
           value: "{EVENT.UPDATE.STATUS}"
         - name: event_id
           value: "{EVENT.ID}"
-        - name: event_name
-          value: "{EVENT.NAME}"
-        - name: event_cause_name
-          value: "{EVENT.CAUSE.NAME}"
-        - name: event_symptoms
-          value: "{EVENT.SYMPTOMS}"
-        - name: item_name
-          value: "{ITEM.NAME}"
-        - name: trigger_name
-          value: "{TRIGGER.NAME}"
+        # - name: event_name
+        #   value: "{EVENT.NAME}"
+        # - name: event_cause_name
+        #   value: "{EVENT.CAUSE.NAME}"
+        # - name: event_symptoms
+        #   value: "{EVENT.SYMPTOMS}"
+        # - name: item_name
+        #   value: "{ITEM.NAME}"
+        # - name: trigger_name
+        #   value: "{TRIGGER.NAME}"
         - name: trigger_id
           value: "{TRIGGER.ID}"
         - name: trigger_url
-          value: "{TRIGGER.URL}"
+          value: "{TRIGGER.URL}" # http://zabbix.mydomain/tr_events.php?triggerid=28617&eventid=28001770
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM

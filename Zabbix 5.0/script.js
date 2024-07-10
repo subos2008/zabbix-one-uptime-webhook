@@ -1,6 +1,23 @@
+/*
+ * One Uptime expects webhook calls with the following schema:"
+
+{
+    "url": "http://zabbix.mydomain/tr_events.php?triggerid=28617&eventid=28001770",
+    "host": "cron.mydomain.com",
+    "alert_subject": "/: Disk space is low (used > 80%)",
+    "alert_description": "Problem 27802117 started at 02:27:06 on 2024.07.05\r\nHost: node26.nc.mydomain\r\nSeverity: Information",
+    "severity": 2
+}
+
+ * severity should be the Zabbix severity, mapping to One Uptime severity levels is done inside One Uptime Workflow 
+*/
+
+
+
 // event_url is an optional extra
 const required_input = [
   'SERVER_URL', // deployment of the code in ../server
+  'ONE_UPTIME_WORKFLOW_WEBHOOK_URL',
 
   // Event severity values:
   // 0: Not classified
@@ -15,9 +32,16 @@ const required_input = [
   'event_is_problem',
   'event_is_update',
 
+  'host',
+
+  'alert_subject',
+  'alert_message', // mapped to alert_description
+
   // Used for mapping (WIP)
-  'event_name',
-  'event_id'
+  // 'event_name',
+  'event_id',
+  'trigger_id',
+  'trigger_url'
 ];
 
 var ZabbixOneUptimeBridgeServer = {

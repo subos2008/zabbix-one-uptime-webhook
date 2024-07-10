@@ -44,32 +44,32 @@ const required_input = [
   'trigger_url'
 ];
 
-var ZabbixOneUptimeBridgeServer = {
+var ZabbixOneUptimeBridge = {
   validate: function (params) {
     required_input.forEach(function (key) {
-      ZabbixOneUptimeBridgeServer.params = {}
+      ZabbixOneUptimeBridge.params = {}
       if (key in params && params[key] != undefined && params[key] !== '') {
-        ZabbixOneUptimeBridgeServer.params[key] = params[key];
+        ZabbixOneUptimeBridge.params[key] = params[key];
       } else {
         console.log(params);
         throw 'Missing value for key: ' + key;
       }
     });
 
-    ZabbixOneUptimeBridgeServer.raw_params = params
+    ZabbixOneUptimeBridge.raw_params = params
 
-    ZabbixOneUptimeBridgeServer.params.event_severity = parseInt(ZabbixOneUptimeBridgeServer.params.event_severity);
-    ZabbixOneUptimeBridgeServer.params.event_is_problem = parseInt(ZabbixOneUptimeBridgeServer.params.event_is_problem);
-    ZabbixOneUptimeBridgeServer.params.event_is_update = parseInt(ZabbixOneUptimeBridgeServer.params.event_is_update);
+    ZabbixOneUptimeBridge.params.event_severity = parseInt(ZabbixOneUptimeBridge.params.event_severity);
+    ZabbixOneUptimeBridge.params.event_is_problem = parseInt(ZabbixOneUptimeBridge.params.event_is_problem);
+    ZabbixOneUptimeBridge.params.event_is_update = parseInt(ZabbixOneUptimeBridge.params.event_is_update);
 
-    if (ZabbixOneUptimeBridgeServer.event_is_problem == 1) {
-      if (ZabbixOneUptimeBridgeServer.event_is_update == 0) {
-        ZabbixOneUptimeBridgeServer.kind = 'problem';
+    if (ZabbixOneUptimeBridge.event_is_problem == 1) {
+      if (ZabbixOneUptimeBridge.event_is_update == 0) {
+        ZabbixOneUptimeBridge.kind = 'problem';
       } else {
-        ZabbixOneUptimeBridgeServer.kind = 'update';
+        ZabbixOneUptimeBridge.kind = 'update';
       }
     } else {
-      ZabbixOneUptimeBridgeServer.kind = 'recovery';
+      ZabbixOneUptimeBridge.kind = 'recovery';
     }
   },
 
@@ -81,27 +81,29 @@ var ZabbixOneUptimeBridgeServer = {
       }
     });
 
-    const path = '/api/zabbix_webhook';
+    // const path = '/api/zabbix_webhook';
     var request = new CurlHttpRequest();
     request.AddHeader('Content-Type: application/json');
-    var url = ZabbixOneUptimeBridgeServer.raw_params.SERVER_URL + path;
+    var url = ZabbixOneUptimeBridge.raw_params.ONE_UPTIME_WORKFLOW_WEBHOOK_URL;
 
-    console.log('[ZabbixOneUptimeBridgeServer Webhook] new request to: ' + url);
+    console.log('[ZabbixOneUptimeBridge Webhook] new request to: ' + url);
 
-    var blob = request.Post(url, JSON.stringify({ data: ZabbixOneUptimeBridgeServer.raw_params }));
+    var blob = request.Post(url, JSON.stringify({ data: ZabbixOneUptimeBridge.raw_params }));
 
     var resp = JSON.parse(blob);
 
     if (request.Status() !== 200) {
       console.error(
-        '[ZabbixOneUptimeBridgeServer Webhook] Request failed, status ' +
+        '[ZabbixOneUptimeBridge Webhook] Request failed, status ' +
           request.Status() +
           ': ' +
           resp.error
-      );
+      )
       throw 'Request failed: ' + request.Status() + ' ' + resp.error;
+    } else {
+      console.log(`[ZabbixOneUptimeBridge Webhook] OneUttime responded: status: ${resp.status}`)
     }
-    // console.log('[ZabbixOneUptimeBridgeServer Webhook] created incident with id: ' + incident_id);
+    // console.log('[ZabbixOneUptimeBridge Webhook] created incident with id: ' + incident_id);
   },
 
 };
@@ -109,12 +111,12 @@ var ZabbixOneUptimeBridgeServer = {
 try {
   var params = JSON.parse(value);
   console.log(params);
-  ZabbixOneUptimeBridgeServer.validate(params);
-  // if (ZabbixOneUptimeBridgeServer.kind == 'problem') {
-    ZabbixOneUptimeBridgeServer.forwardToServer();
+  ZabbixOneUptimeBridge.validate(params);
+  // if (ZabbixOneUptimeBridge.kind == 'problem') {
+    ZabbixOneUptimeBridge.forwardToServer();
   // }
   return 'OK';
 } catch (error) {
-  console.error('[ZabbixOneUptimeBridgeServer Webhook] Error: ' + error);
+  console.error('[ZabbixOneUptimeBridge Webhook] Error: ' + error);
   throw 'Sending failed: ' + error;
 }
